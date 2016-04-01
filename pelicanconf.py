@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 AUTHOR = 'João Loula'
 SITENAME = 'João Loula'
 SITEURL = ''
-
+THEME = 'pure-single-master'
 PATH = 'content'
 
 TIMEZONE = 'Europe/Paris'

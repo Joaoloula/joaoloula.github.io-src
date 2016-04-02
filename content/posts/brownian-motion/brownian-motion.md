@@ -14,7 +14,7 @@ In this post, we'll explore different characteristics of the Brownian movement, 
 Let $X_i$ be a sequence of Bernoulli random variables that take the values $-1$ and $1$ with equal probability. We can then define the random variable $B_n$ as: 
 
 <p align="center">
-  <img src = "https://raw.githubusercontent.com/Joaoloula/brown-movement/master/equations/brown_definition.jpg"/>
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/equations/brown_definition.jpg"/>
 </p>
 
 We can show, using the central limit theorem, that $B_n$ converges in law to a centered normal distribution of variance $t$ when $n$ goes to infinity. Taking this limit in a vector $(B_n(t))$ whose entries are $B_n$ calculated at increasing times, we obtain the stochastic process $(B(t))$, that we call the Brownian movement. Its first remarkable property is that, by construction, given $t$ bigger than $s$:
@@ -51,7 +51,7 @@ We'll introduce a time interval $\alpha$, during which the particle suffers $N \
   <img src = "https://raw.githubusercontent.com/Joaoloula/brown-movement/master/equations/pollen_model.jpg"/>
 </p>
 
-Where Y is a random variable of centered gaussian distribution with variance one (which we can infer from applying the central limit theorem to the first expression). To make the notation less cluttered, we'll set $a = -\lambda\alpha$ and $b = \sqrt{N\sigma^2\alpha}$.
+Where $Y$ is a random variable of centered gaussian distribution with variance one (which we can infer from applying the central limit theorem to the first expression). To make the notation less cluttered, we'll set $a = -\lambda\alpha$ and $b = \sqrt{N\sigma^2\alpha}$.
 
 The interest of this formulation is that we can now proceed to quantitaive analysis of the position $X_n$ and velocity $V_n$ of a particle subject to brownian movement ($X_n$ is just a "discrete integration" of the velocity, that is, a $\sum\limits_{i} V_i\alpha$). 
 

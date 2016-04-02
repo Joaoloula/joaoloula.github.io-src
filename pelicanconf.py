@@ -3,8 +3,8 @@
 from __future__ import unicode_literals
 
 AUTHOR = 'João Loula'
-SITENAME = 'João Loula'
-TAGLINE = 'Lorem ipsum blablabla'
+SITENAME = 'Waste Books'
+TAGLINE = 'Collected musings on math and programming.'
 SITEURL = ''
 THEME = 'pure-single-master'
 PATH = 'content'
@@ -29,7 +29,7 @@ SOCIAL = (
 DISQUS_SITENAME = 'mydisqus'
 DISQUS_ON_PAGESE = True
 GOOGLE_ANALYTICS = 'UA-00000000-0'
-COVER_IMG_URL = '/images/cover.jpg'
+COVER_IMG_URL = '/images/cover_stone.jpg'
 PROFILE_IMG_URL = '/images/joao.jpg'
 DEFAULT_PAGINATION = 10
 

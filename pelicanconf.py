@@ -4,10 +4,11 @@ from __future__ import unicode_literals
 
 AUTHOR = 'João Loula'
 SITENAME = 'João Loula'
+TAGLINE = 'Lorem ipsum blablabla'
 SITEURL = ''
 THEME = 'pure-single-master'
 PATH = 'content'
-
+STATIC_PATHS = ['images', 'pages']
 TIMEZONE = 'Europe/Paris'
 
 DEFAULT_LANG = 'en'
@@ -21,19 +22,20 @@ AUTHOR_FEED_RSS = None
 
 # Social widget
 SOCIAL = (
-    ('github-alt', 'https://github.com/joaoloula'),
-    ('linkedin', 'https://fr.linkedin.com/in/joão-loula-2836b9107'),
-	('envelope', 'mailto:joao.campos-loula@polytechnique.edu')
+    ('github-square', 'https://github.com/joaoloula'),
+    ('linkedin-square', 'https://fr.linkedin.com/in/joão-loula-2836b9107'),
+    ('envelope-square', 'mailto:joao.campos-loula@polytechnique.edu'),
 )
 DISQUS_SITENAME = 'mydisqus'
 DISQUS_ON_PAGESE = True
 GOOGLE_ANALYTICS = 'UA-00000000-0'
-COVER_IMG_URL = '/home/loula/Pictures/Wallpapers/reading_mountains.jpg'
-PROFILE_IMG_URL = '/home/loula/Pictures/Joao/profilepic_june.jpg'
-SOCIAL = (('You can add links in your config file', '#'),
-          ('Another social link', '#'),)
-
+COVER_IMG_URL = '/images/cover.jpg'
+PROFILE_IMG_URL = '/images/joao.jpg'
 DEFAULT_PAGINATION = 10
 
+# Plugins
+PLUGIN_PATHS = ["plugins"]
+PLUGINS = ["render-math"]
+
 # Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
+# RELATIVE_URLS = True

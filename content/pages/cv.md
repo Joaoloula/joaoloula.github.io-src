@@ -1,3 +1,3 @@
 Title: CV
 
-![alt text](<{filename}/pdfs/cv.pdf> "CV")
+![alt text]({filename}/images/cv.jpg)

@@ -37,7 +37,7 @@ In two and three dimensions, for $n=100$ and $t=1000$ (the time axis is now ommi
 </p>
 
 <p align="center">
-  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S5-3d-(n=100, t=1000).png"/>
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/cover.png"/>
 </p>
 
 Quite the looker, isn't it? We'll now try a more quantitative analysis to get a feel for what's going on.

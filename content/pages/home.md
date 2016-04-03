@@ -4,6 +4,4 @@ Save_as: index.html
 Status: hidden
 
 # Math/Programming
-[![alt text]({filename}/images/Brownian Motion.jpg "Brownian motion")](brownian-motion.html)
-
-![alt-text]({filename}/images/cover_fish.jpg)
+[![alt text]({filename}/images/rsz_bmotion.jpg "Brownian motion")](brownian-motion.html)

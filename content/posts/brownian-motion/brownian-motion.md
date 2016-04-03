@@ -10,7 +10,7 @@ In this post, we'll explore different characteristics of the Brownian motion, go
 
 Code for the simulations can be found [here](https://github.com/Joaoloula/joaoloula.github.io-src/tree/master/content/posts/brownian-motion/code)
 
-# Discovering the Brownian movement
+## Discovering the Brownian movement
 
 Let $X_i$ be a sequence of Bernoulli random variables that take the values $-1$ and $1$ with equal probability. We can then define the random variable $B_n$ as: 
 
@@ -42,7 +42,7 @@ In two and three dimensions, for $n=100$ and $t=1000$ (the time axis is now ommi
 
 Quite the looker, isn't it? We'll now try a more quantitative analysis to get a feel for what's going on.
 
-# Position and speed distribution in discrete time
+## Position and speed distribution in discrete time
 
 Robert Brown, the botanist after whom the process is named, first discovered it when observing the movement of pollen particules suspended in water: the random collisions of water mollecules with the particules created a very irregular movement that he was incapable of explaining. The phenomenon was later explained in detail by Einstein in a 1905 paper [1]. The model can be explained as follows: the acceleration of the particule is proportional to the force exercised by the random collisions; there's also a friction force proportional to the particle's speed (we'll call this proportionnality factor lambda). We'll ignore weight as well as buoyancy: we can get away with this because the pollen particle is really small.
 
@@ -86,7 +86,7 @@ What we see is that the term $a$ controls the influence of the previous velocity
   <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S8-3-pollen2d.png"/>
 </p>
 
-# Continuous time
+## Continuous time
 
 So we've gotten some pretty interesting results so far for our model of Brownian movement, but you might be thinking our formulation is not yet satisfactory for a large range of problems: most systems do not behave in an organized discrete manner, weighing inputs like they were votes and then deciding which action to take at each discrete time step, but are rather complicated phenomena that are at all times being influenced by different factors in a *continuous* way -- or at least, like stock markets, chains of events that happen so quickly with respect to our measuring instruments and reaction times that they might as well be continuous. We can then ask ourselves if there's a rigorous mathematical way in which we can expand Brownian motion to continuous time. That's the problem we'll address in this section.
 
@@ -124,7 +124,7 @@ In the continuous limit, velocity variance is well-behaved with respect to time,
 
 We can se that the positions spread wider and wider as we increase the timescale. 
 
-# A kinetic model
+## A kinetic model
 
 This sort of behavior for the position variable, while corresponding to the idea of a free evolution of the particle, is not always desirable. More precisely, in many physical systems, the particle's a priori unbounded movement is counteracted by a force that attracts it to a center (a charged particle, a massive body). This is the sort of model we'll investigate in this section. With this goal in mind, we introduce new velocity and position random variables defined by:
 
@@ -150,6 +150,6 @@ Besides confirming our hypothesis as we can see from the exponential envelope an
   <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S13-(position t=100, K=25).png"/>
 </p>
 
-# References
+## References
 
 [1] http://users.physik.fu-berlin.de/~kleinert/files/eins_brownian.pdf

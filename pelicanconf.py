@@ -8,7 +8,7 @@ TAGLINE = 'Collected musings on math and programming.'
 SITEURL = 'http://joaoloula.github.io'
 THEME = 'pure-single-master'
 PATH = 'content'
-STATIC_PATHS = ['images', 'pages']
+STATIC_PATHS = ['images', 'pages', 'pdfs']
 TIMEZONE = 'Europe/Paris'
 
 DEFAULT_LANG = 'en'
@@ -37,17 +37,6 @@ DEFAULT_PAGINATION = 10
 PLUGIN_PATHS = ["plugins"]
 PLUGINS = ["render-math"]
 
-# Home Page
-DISPLAY_PAGES_ON_MENU = False
-DISPLAY_CATEGORIES_ON_MENU = True
-USE_FOLDER_AS_CATEGORY = True
-PATH = 'content'
-ARTICLE_PATHS = ['posts',]
-PAGE_PATHS = ['pages',]
-MENUITEMS = (
-    ('About', '/pages/about.html'),
-    ('CV', '/pages/cv.pdf'),
-)
 
 # Uncomment following line if you want document-relative URLs when developing
 # RELATIVE_URLS = True

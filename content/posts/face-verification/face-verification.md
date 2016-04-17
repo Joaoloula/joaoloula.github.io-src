@@ -1,16 +1,20 @@
-Title:  Sparse Face Verification 
+Title:  Face Verification 
 Tuthor: João Loula
 Date:   2016-04-17
+Category: Math/Programming
+Tags: face verification, convolutional neural networks, exemplar svms
 Slug: face-verification
 publications_src: content/posts/face-verification/references.bib
 
+Code for this post can be found [here]("https://github.com/Joaoloula/sparse-face-verification")
+
 # Introduction
 
-Suppose we want to implement a biometric system in which, given a picture of a person's face taken by a camera, a software determines whether this person belongs to a predefined group of people who are allowed to perform a certain action -- this could be giving someone access to a building, or allowing them to start up a car or unlock a smartphone -- and takes a decision accordingly. One of the possible approaches to the system's design is to have a list of images of authorized users' faces and, when confronted with a new person, to analyze whether the image of their face matches with that of one of these users. This problem is known as \textit{face verification}, and it's an open question that is the subject of a lot of current research in computer vision.
+Suppose we want to implement a biometric system in which, given a picture of a person's face taken by a camera, a software determines whether this person belongs to a predefined group of people who are allowed to perform a certain action -- this could be giving someone access to a building, or allowing them to start up a car or unlock a smartphone -- and takes a decision accordingly. One of the possible approaches to the system's design is to have a list of images of authorized users' faces and, when confronted with a new person, to analyze whether the image of their face matches with that of one of these users. This problem is known as *face verification*, and it's an open question that is the subject of a lot of current research in computer vision.
 
 The diversity of situations described indicate that such a software, in order to have satisfactory performance, should be robust to most variations found in real-world images: different lighting conditions, rotation, misalignment etc.
 
-If, on top of that, we also want to be able to easily add people to the authorized users group, it would be advantageous if our system was able to take the decision described earlier based on \textit{sparse} data, that is, a small number of example pictures per user in the authorized users group. That way, the process of adding users to the group would be only a matter of taking one or two pictures of their face, which would be then added to the database.
+If, on top of that, we also want to be able to easily add people to the authorized users group, it would be advantageous if our system was able to take the decision described earlier based on *sparse* data, that is, a small number of example pictures per user in the authorized users group. That way, the process of adding users to the group would be only a matter of taking one or two pictures of their face, which would be then added to the database.
 
 # Face Verification
 
@@ -24,7 +28,7 @@ Face verification can be thought of as a classification problem: given a face im
 </figure>
 
 
-Framed in the domain of machine learning, the problems becomes learning the function $f$ from a labeled dataset comprised of genuine and impostor pairs. We evaluate three different approaches to this problem: a simple, linear model of Exemplar Support Vector Machines (SVMs), Siamese Convolutional Neural Networks (CNNs)  and the state-of-the-art identification algorithm DeepID.
+Framed in the domain of machine learning, the problems becomes learning the function $f$ from a labeled dataset comprised of genuine and impostor pairs. We'll introduce three different approaches to this problem: a simple, linear model of Exemplar Support Vector Machines (SVMs), Siamese Convolutional Neural Networks (CNNs)  and the state-of-the-art identification algorithm DeepID.
 
 # Exemplar SVMs
 
@@ -48,7 +52,7 @@ One of the ways to tackle the face verification problem is to search for a dista
 d({x_1}, {x_2}) = \sqrt{{(x_1-x_2)}^T{M}{(x_1-x_2)}}
 \end{equation}
 
-satisfies the properties above. This metric is called a Mahalanobis distance, and is has seen wide use in statistics in general and face verification and recognition in particular, specially in combination with Principal Component Analysis as in \citep{mahalanobis}. The characterization of M allows is to write it as a product of another matrix and its transpose, and so $(1)$ is equivalent to:
+satisfies the properties above. This metric is called a Mahalanobis distance, and is has seen wide use in statistics in general and face verification and recognition in particular, specially in combination with Principal Component Analysis as in [@@mahalanobis]. The characterization of M allows is to write it as a product of another matrix and its transpose, and so $(1)$ is equivalent to:
 
 \begin{equation}
 d({x_1}, {x_2}) = ||{W}{x_1}-{W}{x_2}||
@@ -82,7 +86,7 @@ DeepID implements a CNN with four convolutional layers, of kernel sizes 4x4, 3x3
 
 After training on the identification task, we can remove the softmax layer and use the fully-connected DeepID layer as a descriptor for an algorithm that will perform verification on a 160-dimensional space. In Sun's paper, the method found to have the best results was the joint-bayesian model.
 
-Joint-bayesian models \citep{joint-bayesian} the class centers $\mu$ as well as the intra-class variations $\epsilon$ both follow a centered gaussian distributions, whose covariance matrices $S_\mu$ and $S_\epsilon$ are the objects we're trying to infer from the data.
+Joint-bayesian models [@@joint-bayesian] the class centers $\mu$ as well as the intra-class variations $\epsilon$ both follow a centered gaussian distributions, whose covariance matrices $S_\mu$ and $S_\epsilon$ are the objects we're trying to infer from the data.
 
 \begin{equation}
 x = \mu + \epsilon, \; \; \mu\sim\mathcal{N}\big(0, S_\mu), \; \; \epsilon\sim\mathcal{N}\big(0, S_\epsilon)

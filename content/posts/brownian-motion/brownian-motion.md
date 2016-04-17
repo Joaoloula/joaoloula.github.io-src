@@ -1,6 +1,6 @@
 Title: Brownian Motion
 Date: 2016-04-02 14:54
-Category: Python
+Category: Math/Programming
 Tags: brownian motion, stochastic process, physics
 Slug: brownian-motion
 Author: João Loula
@@ -8,7 +8,7 @@ Summary: In this post, we'll explore different characteristics of the Brownian m
 
 In this post, we'll explore different characteristics of the Brownian motion, going from the discrete to the continuous case, and finally expressing the particle's behavior in large times. This model has been the subject of various applications in different areas, like biochemistry, medical imaging and financial markets, and the domain has shown itself to be a fertile subject in mathematics, with important contributions from the likes of Paul Levy, Norbert Wiener and Albert Einstein.
 
-Code for the simulations can be found [here](https://github.com/Joaoloula/joaoloula.github.io-src/tree/master/content/posts/brownian-motion/code)
+Code for this post can be found [here](https://github.com/Joaoloula/joaoloula.github.io-src/tree/master/content/posts/brownian-motion/code)
 
 ## Discovering the Brownian movement
 

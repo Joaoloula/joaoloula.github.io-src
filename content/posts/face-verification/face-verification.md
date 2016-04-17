@@ -6,7 +6,7 @@ Tags: face verification, convolutional neural networks, exemplar svms
 Slug: face-verification
 publications_src: content/posts/face-verification/references.bib
 
-Code for this post can be found [here]("https://github.com/Joaoloula/sparse-face-verification")
+Code for this post can be found [here](https://github.com/Joaoloula/sparse-face-verification)
 
 # Introduction
 

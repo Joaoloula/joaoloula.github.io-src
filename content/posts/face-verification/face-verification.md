@@ -24,7 +24,7 @@ Face verification can be thought of as a classification problem: given a face im
 
 <figure>
     <img src="https://raw.githubusercontent.com/Joaoloula/sparse-face-verification/master/images/genuine-impostor.jpg" alt='missing' align='middle'/>
-    <figcaption>Example of genuine (top) and impostor (bottom) pairs from the LFW dataset.</figcaption>
+    <figcaption><sup> Example of genuine (top) and impostor (bottom) pairs from the LFW dataset (source: [@@title-image]).</sup></figcaption>
 </figure>
 
 
@@ -40,7 +40,7 @@ The next step is to fit a linear SVM model for each positive example in the data
 
 <figure>
   <img src = "https://raw.githubusercontent.com/Joaoloula/sparse-face-verification/master/images/calibration.jpg" align='middle'/>
-  <figcaption> Illustration of the calibration step on an Exemplar SVM. </figcaption>
+  <figcaption><sup> Illustration of the calibration step on an Exemplar SVM [@@exemplar-svm]. </sup></figcaption>
 </figure>
 
 
@@ -66,7 +66,7 @@ The idea of the Siamese CNNs architecure [@@siamese-cnns] is to train two identi
 
 <figure>
   <img src = "https://raw.githubusercontent.com/Joaoloula/sparse-face-verification/master/images/siamese-cnns.jpg" align='middle'/>
-  <figcaption> Schema of the Siamese CNNs architecture. </figcaption>
+  <figcaption><sup> Scheme of the Siamese CNNs architecture (source: [@@siamese-cnns]). </sup></figcaption>
 </figure>
 
 In our implementation, each CNN is comprised of three convolutions, all of kernel size 6x6, and computing respectively 5, 14 and 60 features, followed by a fully-connected layer that computes 40 features. Convolutions 1 and 2 are also followed by 2x2 max-pooling layers.
@@ -81,7 +81,7 @@ DeepID implements a CNN with four convolutional layers, of kernel sizes 4x4, 3x3
 
 <figure>
   <img src = "https://raw.githubusercontent.com/Joaoloula/sparse-face-verification/master/images/deepid.jpg" align='middle'/>
-  <figcaption> Visualization of the DeepID architecture. </figcaption>
+  <figcaption><sup> Visualization of the DeepID architecture (source: [@@deepid]). </sup></figcaption>
 </figure>
 
 After training on the identification task, we can remove the softmax layer and use the fully-connected DeepID layer as a descriptor for an algorithm that will perform verification on a 160-dimensional space. In Sun's paper, the method found to have the best results was the joint-bayesian model.

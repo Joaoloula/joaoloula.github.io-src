@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 AUTHOR = 'João Loula'
-SITENAME = 'Waste Books'
+SITENAME = 'João Loula\'s Blog'
 TAGLINE = 'Collected musings on math and programming.'
 SITEURL = 'http://joaoloula.github.io'
 THEME = 'pure-single-master'

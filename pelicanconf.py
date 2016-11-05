@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 AUTHOR = 'João Loula'
 SITENAME = 'João Loula\'s Blog'
-TAGLINE = 'Collected musings on math and programming.'
+TAGLINE = 'Collected musings on neuroscience, machine learning and math.'
 SITEURL = 'http://joaoloula.github.io'
 THEME = 'pure-single-master'
 PATH = 'content'

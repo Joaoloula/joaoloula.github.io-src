@@ -16,7 +16,7 @@ Nilearn is a python module for statistical and machine learning analysis on brai
 This is how a typical Nilearn analysis goes:
 
 <figure>
-	<img src="https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/functional-atlas/DMN.jpg" alt='missing' align='middle' />
+	<img src="https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/functional-atlas/nilearn_candy.png" alt='missing' align='middle' />
 	<figcaption> <sup>source: [@@nilearn-poster]</sup>
 </figure>
 

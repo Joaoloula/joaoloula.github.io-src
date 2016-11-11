@@ -5,7 +5,9 @@ Tags: surface plot, atlas, statistical map
 Slug: surface-plotting
 Author: João Loula
 publications_src: content/posts/surf-plotting/references.bib
-Summary: In this post we'll explore Nilearn's recently acquired surface plotting capabilities through an example using seed-based resting state connectivity analysis.
+Summary: In this post we'll explore Nilearn's future surface plotting capabilities through an example using seed-based resting state connectivity analysis. 
+
+In this post we'll explore Nilearn's future surface plotting capabilities through an example using seed-based resting state connectivity analysis. This is based on work done by Julia Huntenburg (you can take a look at the PR's progress [here](https://github.com/nilearn/nilearn/pull/1016)) with whom I had the pleasure of collaborating on the 2016 Paris Brainhack.
 
 We start by importing the libraries we're gonna need:
 
@@ -48,7 +50,7 @@ fsaverage5_inflated = fsaverage['infl_left'][0]
 sulcal_depth_map = fsaverage['sulc_left'][0]
 ```
 
-Last steps needed for our analysis: we'll pick a region as seed (we'll choose the dorsal posterior cingulate gyrus) and extract the time-series correspondent to it. Next, we want to calculate statistical correlation between the seed time-series and time-series of other cortical regions. For our measure of correlation, we'll use the Pearson product-moment correlation coefficient, given by $ \rho_{X, Y} \frac{\text{cov}\left( X, Y \right)}{ \sigma_X \sigma_Y } $.
+Last steps needed for our analysis: we'll pick a region as seed (we'll choose the dorsal posterior cingulate gyrus) and extract the time-series correspondent to it. Next, we want to calculate statistical correlation between the seed time-series and time-series of other cortical regions. For our measure of correlation, we'll use the Pearson product-moment correlation coefficient, given by $ \rho_{X, Y} \frac{\text{cov}\left( X, Y \right)}{ \sigma_X \sigma_Y }$.
 
 ```python
 # Load resting state time series and parcellation

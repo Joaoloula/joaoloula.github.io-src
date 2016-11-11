@@ -7,7 +7,7 @@ Author: João Loula
 publications_src: content/posts/functional-atlas/references.bib
 Summary: This post is based on the Nilearn tutorial given by myself and Alex Abraham at the 2016 Brainhack Vienna: in it, we'll give a brief introduction to Nilearn and its functionalities, and we'll present a usecase of extracting a functional brain atlas from the ABIDE resting state dataset.
 
-This post is based on the Nilearn tutorial given by myself and Alex Abraham at the 2016 Brainhack Vienna: in it, we'll give a brief introduction to Nilearn and its functionalities, and we'll present a usecase of extracting a functional brain atlas from the ABIDE resting state dataset.
+This post is based on the Nilearn tutorial given by myself and Alex Abraham at the 2016 Brainhack Vienna: in it, we'll give a brief introduction to Nilearn and its functionalities, and we'll present a usecase of extracting a functional brain atlas from the ABIDE resting state dataset. The presentation slides along with the tutorial notebook can be found [here](https://github.com/Joaoloula/nilearn-tutorial-brainhack-2016-vienna).
 
 ## Nilearn
 

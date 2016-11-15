@@ -24,7 +24,7 @@ Suppose we have an agent, say a mouse, in an environment consisting of states it
 
 
 <p align="center">
-  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement_learning/maze_mouse.png"/>
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement-learning/maze_mouse.png"/>
 </p>
 
 How can we find the path that optimizes the mouse's rewards? Well, we can start from the Bellman equation:
@@ -40,7 +40,7 @@ What this equation, the principle of dynamic programming, tells us, is that calc
 The real world, however, is a lot messier: for one thing, both state transitions and rewards are usually not deterministic, but rather probabilistic in nature. Things for our mouse might actually look more like this:
 
 <p align="center">
-  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement_learning/maze_complicated_mouse.png"/>
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement-learning/maze_complicated_mouse.png"/>
 </p>
 
 The setup is the following: the agent starts in an initial state, and at each time point he can pick one of two actions (take the arrow up or down), which can lead him to different states with some given probability. Each state is also associated with a probabilistic reward (rewards can alternatively be associated not with a state, but rather with a specific state transition) : this kind of system is what's called a Markov Decision Process -- a generalization of Markov Chains allowing for actions (i.e. control of the stochastic system) and rewards.
@@ -70,9 +70,8 @@ Model-free learning pros and cons are:
 
 
 
-  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement_learning/maze_mouse.png"/>
 <figure>
-	<img src="https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement_learning/F3_large.jpg" alt='missing' align='middle' />
+	<img src="https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement-learning/F3_large.jpg" alt='missing' align='middle' />
 	<figcaption> <sup> The most successful prediction of model free RL: the dopamine system. When a stimulus-reward pair is learned, dopaminergic neurons fire at the stimulus onset and not at the reward; when the reward does not succeed the stimulus, we see instead a negative firing rate. This evidence points towards the neural implementation of a TD-like algorithm [@@schulz] </sup>
 </figure>
 

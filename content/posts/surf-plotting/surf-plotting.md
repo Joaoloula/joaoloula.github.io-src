@@ -9,6 +9,8 @@ Summary: In this post we'll explore Nilearn's future surface plotting capabiliti
 
 In this post we'll explore Nilearn's future surface plotting capabilities through an example using seed-based resting state connectivity analysis. This is based on work done by Julia Huntenburg (you can take a look at the PR's progress [here](https://github.com/nilearn/nilearn/pull/1016)) with whom I had the pleasure of collaborating on the 2016 Paris Brainhack.
 
+## Setting things up
+
 We start by importing the libraries we're gonna need:
 
 ```python
@@ -72,6 +74,8 @@ for i in range(timeseries.shape[0]):
 # Re-mask previously masked nodes (medial wall)
 stat_map[np.where(np.mean(timeseries, axis=1) == 0)] = 0
 ```
+
+## Plotting
 
 Now for the actual plotting: we start by plotting the seed:
 

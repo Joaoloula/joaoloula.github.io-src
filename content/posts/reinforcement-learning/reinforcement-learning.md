@@ -34,7 +34,7 @@ $$Q\left(s_t\right) = \max_{a_t} \{ R(s_t, a_t) + Q \left(s_{t+1}\right)\}$$
 What this equation, the principle of dynamic programming, tells us, is that calculating the Q-value of a given node is as easy as starting from the end (where the values are equivalent to the rewards) and working backwards by computing the optimal step at each time point. Following this procedure gives us the optimal path:
 
 <p align="center">
-  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement_learning/maze_path_mouse.png"/>
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement-learning/maze_path_mouse.png"/>
 </p>
 
 The real world, however, is a lot messier: for one thing, both state transitions and rewards are usually not deterministic, but rather probabilistic in nature. Things for our mouse might actually look more like this:
@@ -71,7 +71,7 @@ Model-free learning pros and cons are:
 
 
 <figure>
-	<img src="https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement-learning/F3_large.jpg" alt='missing' align='middle' />
+	<img src="https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/reinforcement-learning/dopamine.jpg" alt='missing' align='middle' />
 	<figcaption> <sup> The most successful prediction of model free RL: the dopamine system. When a stimulus-reward pair is learned, dopaminergic neurons fire at the stimulus onset and not at the reward; when the reward does not succeed the stimulus, we see instead a negative firing rate. This evidence points towards the neural implementation of a TD-like algorithm [@@schulz] </sup>
 </figure>
 

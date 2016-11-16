@@ -25,6 +25,7 @@ SOCIAL = (
     ('github-square', 'https://github.com/joaoloula'),
     ('linkedin-square', 'https://fr.linkedin.com/in/joão-loula-2836b9107'),
     ('envelope-square', 'mailto:joao.campos-loula@polytechnique.edu'),
+    ('twitter-square', 'https://twitter.com/JoaoLoula'),
 )
 DISQUS_SITENAME = 'mydisqus'
 DISQUS_ON_PAGESE = True

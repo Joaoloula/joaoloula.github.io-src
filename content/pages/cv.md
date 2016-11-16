@@ -1,3 +1,3 @@
 Title: CV
 
-![alt text]({filename}/images/cv.jpg)
+![alt text]({filename}/images/cv.pdf)

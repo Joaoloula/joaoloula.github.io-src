@@ -64,9 +64,9 @@ which can then be used by a [SARSA](https://en.wikipedia.org/wiki/State-Action-R
 
 Model-free learning pros and cons are:
 
-- <code class="green">Computationally efficient, since decision-making consists of looking up a table.</code>
+- Computationally efficient, since decision-making consists of looking up a table.
 
-- <code class="red">Inflexible to changes in the MDP structure (transition probabilities or rewards), since they're not explicited in the model and thus can only be accounted for by relearning state-action values.</code>
+- Inflexible to changes in the MDP structure (transition probabilities or rewards), since they're not explicited in the model and thus can only be accounted for by relearning state-action values.
 
 
 
@@ -81,9 +81,9 @@ Conversely, we can focus on estimating the right side of the equation: this lead
 
 Model-based learning pros and cons are:
 
-- <code class="green">Highly flexible: rewards and transition probabilities can be easily re-calculated in case of changes to the environment.</code>
+- Highly flexible: rewards and transition probabilities can be easily re-calculated in case of changes to the environment.
 
-- <code class="red">Computationally expensive, since running estimates of all parameters for an internal model of the MDP must be kept, and used for decision-making computations.</code>
+- Computationally expensive, since running estimates of all parameters for an internal model of the MDP must be kept, and used for decision-making computations.
 
 \section*{When to use each learning algorithm class?}
 

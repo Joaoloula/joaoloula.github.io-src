@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="João Loula's Blog, Collected musings on neuroscience, machine learning and math.">
+
+
+        <title>Parallel CNN Tracking // João Loula's Blog // Collected musings on neuroscience, machine learning and math.</title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://joaoloula.github.io/theme/css/pure.css">
+    <link rel="stylesheet" href="http://joaoloula.github.io/theme/css/pygments.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background-image: url('/images/cover_stone.jpg')">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <img class="avatar" src="/images/joao.jpg">
+                            <h1 class="brand-main"><a href="http://joaoloula.github.io">João Loula's Blog</a></h1>
+                            <p class="tagline">Collected musings on neuroscience, machine learning and math.</p>
+                                <p class="social">
+                                    <a href="https://github.com/joaoloula">
+                                        <i class="fa fa-github-square fa-3x"></i>
+                                    </a>
+                                    <a href="https://fr.linkedin.com/in/joão-loula-2836b9107">
+                                        <i class="fa fa-linkedin-square fa-3x"></i>
+                                    </a>
+                                    <a href="mailto:joao.campos-loula@polytechnique.edu">
+                                        <i class="fa fa-envelope-square fa-3x"></i>
+                                    </a>
+                                    <a href="https://twitter.com/JoaoLoula">
+                                        <i class="fa fa-twitter-square fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Parallel CNN Tracking</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="http://joaoloula.github.io/tag/tracking.html">tracking</a>
+                                <a class="post-category" href="http://joaoloula.github.io/tag/convolutional-neural-networks.html">convolutional neural networks</a>
+                                <a class="post-category" href="http://joaoloula.github.io/tag/parallel-computing.html">parallel computing</a>
+                        </p>
+                </header>
+            </section>
+            <p>Code for this post can be found <a href="https://github.com/Joaoloula/siamese-tracking">here</a></p>
+<h1>Introduction</h1>
+<p>The idea of this post is to take the approach described in [@@seebymoving] and implement it in a parallelized fashion. Namely, we will create a Siamese CNNs architecture for object tracking using caffe, and distribute its computations with both coarse and medium-grain parallelization using MPI (for an introduction to neural networks and CNNs, see <a href="http://colah.github.io/posts/2014-03-NN-Manifolds-Topology/">these</a> <a href="http://colah.github.io/posts/2014-07-Conv-Nets-Modular">two</a> posts on Christopher Olah's blog, a sketch of the principles behind Siamese CNNs can be found in my <a href="http://joaoloula.github.io/face-verification.html">face-verification post</a>. Finally, a great introduction to MPI and High Performance Computing in general is Frank Nielsen's book, whose preview can be found <a href="https://books.google.fr/books?id=eDiFCwAAQBAJ&amp;pg=PR4&amp;lpg=PR4&amp;dq=ecole+polytechnique+hpc+mpi&amp;source=bl&amp;ots=3vsFSyEWs4&amp;sig=wBI83cR9_-u1PNHlE16ryUDrEgw&amp;hl=en&amp;sa=X&amp;ved=0ahUKEwiZ6dCK_cjNAhUCuBoKHfn2CwEQ6AEIIzAB#v=onepage&amp;q=ecole%20polytechnique%20hpc%20mpi&amp;f=false">here</a>).</p>
+<h1>Tracking</h1>
+<p>The goal of this project is to use an architecture called Siamese CNNs to solve an object tracking problem, that is, to map the location of a given object through time in video data, a central problem in areas like autonomous vehicle control and motion-capture videogames.</p>
+<p>Siamese CNNs [@@siamese-cnns] are a model consisting of two identical CNNs that share all their weights. We can think of them as embedding two inputs into some highly structured space, where this output can then be used by some other function. Notable examples include using Siamese CNNs to determine, given two photos, whether they represent the same person [@@deepid2] or, given two images taking consecutively by a moving vehicle, determine the translational and rotational movements that the vehicle has performed [@@seebymoving].</p>
+<figure>
+    <img src="https://raw.githubusercontent.com/Joaoloula/siamese-tracking/master/docs/illustrations/siamese-cnns.jpg" alt='missing' align='middle' />
+    <figcaption> <sup>Visualization of the Siamese CNNs architecture: the two CNNs are identical and share all their weights. In this scheme, their output is directed to an energy function that calculates the norm of the difference (source: [@@siamese-cnns]).</sup>
+</figure>
+
+<p>The idea of the implementation is to train the Siamese CNNs model on evenly spaced pairs of frames in a video of an object moving, and to feed their output to another network that will try to learn the object's movement between the two frames.</p>
+<figure>
+    <img src="https://raw.githubusercontent.com/Joaoloula/siamese-tracking/master/docs/illustrations/trck2.png" alt='missing' align='middle' />
+    <figcaption> <sup>Example of two video frames to serve as input to the Siamese CNNs model: the bounding box represent the ground-truth of the object movement in the dataset (source: [@@car-image]).</sup>
+</figure>
+
+<h1>A Sip of Caffe</h1>
+<p>Caffe [@@caffe] is a deep learning framework written in and interfaced with C++, created by the Berkeley Vision and Learning Center. At its core, it is based on two main objects :</p>
+<ul>
+<li>
+<p><em>Nets</em> represent the architecture of the deep neural network : they are comprised of <em>layers</em> of different types (convolutional, fully-connected, dropout etc.) ;</p>
+</li>
+<li>
+<p><em>Blobs</em> are simply C++ arrays : the data structures being passed along the nets.</p>
+</li>
+</ul>
+<p>Blobs are manipulated throughout the net in <em>forward</em> and <em>backward</em> passes : forward passes denote the process in which the neural network takes some data as input and outputs a prediction, while backward passes refer to backpropagation : the comparison of this prediction with the label and the computation of the gradients of the loss function with respect to the parameters throughout the network in a backwards fashion.</p>
+<h1>Models</h1>
+<p>One of the great strengths of Caffe is the fact that its models are stored in plaintext Google Protocol Buffer [@@protobuf] schemas : it is highly serializable and human-readable, and interfaces well with many programming languages (such as C++ and Python). Let's take a look at how to declare a convolution layer in protobuf:</p>
+<div class="highlight"><pre><span></span><span class="n">layer</span> <span class="p">{</span>
+  <span class="n">name</span><span class="o">:</span> <span class="s">&quot;conv1&quot;</span>
+  <span class="n">type</span><span class="o">:</span> <span class="s">&quot;Convolution&quot;</span>
+  <span class="n">bottom</span><span class="o">:</span> <span class="s">&quot;data&quot;</span>
+  <span class="n">top</span><span class="o">:</span> <span class="s">&quot;conv1&quot;</span>
+  <span class="n">param</span> <span class="p">{</span>
+    <span class="n">name</span><span class="o">:</span> <span class="s">&quot;conv1_w&quot;</span>
+    <span class="n">lr_mult</span><span class="o">:</span> <span class="mi">1</span> 
+  <span class="p">}</span>
+  <span class="n">param</span> <span class="p">{</span>
+    <span class="n">name</span><span class="o">:</span> <span class="s">&quot;conv1_b&quot;</span>
+    <span class="n">lr_mult</span><span class="o">:</span> <span class="mi">2</span> 
+  <span class="p">}</span>
+  <span class="n">convolution_param</span> <span class="p">{</span>
+    <span class="n">num_output</span><span class="o">:</span> <span class="mi">256</span>    
+    <span class="n">kernel_size</span><span class="o">:</span> <span class="mi">5</span>    
+    <span class="n">stride</span><span class="o">:</span> <span class="mi">1</span>          
+    <span class="n">weight_filler</span> <span class="p">{</span>
+      <span class="n">type</span><span class="o">:</span> <span class="s">&quot;gaussian&quot;</span> 
+      <span class="n">std</span><span class="o">:</span> <span class="mf">0.01</span>        
+    <span class="p">}</span>
+    <span class="n">bias_filler</span> <span class="p">{</span>
+      <span class="n">type</span><span class="o">:</span> <span class="s">&quot;constant&quot;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+
+<p>"Name" and "Type" are very straightforward entries : they define a name and a type for that layer. "Bottom" and "Top" define respectively the input and output of the layer. The "param" section defines rules for the parameters of the layers (weights and biases) : the "name" section will be of utmost importance in this project, since naming the parameters will allow us to share them through networks and thus realize the Siamese CNNs architecture, and "lr_mult" defines the multipliers of the learning rates for the parameters (making the biases change twice as fast as the weights tends to work well in practice).</p>
+<h1>Parallelisation</h1>
+<p>MPI-Caffe [@@mpi-caffe] is a framework built by a group at the University of Indiana to interface MPI with Caffe. By default it parallelizes all layers of the network through all nodes in the cluster : nodes can be included or excluded from computation in specific layers. Communication processes like MPIBroadcast and MPIGather are written as layers in the .protobuf file, and the framework automatically computes the equivalent expression for the gradients in the backward pass.</p>
+<figure>
+    <img src="https://raw.githubusercontent.com/Joaoloula/siamese-tracking/master/docs/illustrations/mpi_caffe.png" alt='missing' align='middle' />
+    <figcaption> <sup>Example of a CNN architecture parallelised using MPI-Caffe. The Network is specified on the left, and for each layer there is a "0" when only the root is included in that layer's computation and a "-" when all nodes are included in it. The MPIBroadcast and MPIGather begin and end respectively the parallelised section of the code (source: [@@mpi-caffe]).</sup>
+</figure>
+
+<p>One of the great advantages of the model is that possibility of parallelisation is twofold:</p>
+<ul>
+<li>
+<p><em>Across Siamese Networks</em> (medium grain): the calculations performed by each of the two Siamese CNNs can be run independently, with their results being sent back to feed the function on top;</p>
+</li>
+<li>
+<p><em>Across Image Pairs</em> (coarse grain): to increase the number of image pairs in each batch in training, and the speed with which they are processed, we can separate them in mini-batches that are processed across different machines in a cluster.</p>
+</li>
+</ul>
+<h1>MNIST</h1>
+<h2>The Dataset</h2>
+<p>MNIST [@@mnist] is a dataset consisting of 70,000 28x28 grayscale images (split in a train and a test set in a 6:1 proportion) representing handwritten digits, with labels from 0 to 9 that stand for the digit represented by each image. The dataset is stored in the not-so-intuitive IDX file format, but we'll be using <a href="http://pjreddie.com/projects/mnist-in-csv/">a CSV version available online</a> in this project.</p>
+<figure>
+    <img src="https://raw.githubusercontent.com/Joaoloula/siamese-tracking/master/docs/illustrations/mnist.png" alt='missing' align='middle' />
+    <figcaption> <sup>Example of images from the MNIST dataset (source: Rodrigo Benenson's blog).</sup>
+</figure>
+
+<h2>Preprocessing</h2>
+<p>For the tracking task, preprocessing was done by transforming images in the dataset by a combination of rotations and translations. Rotations were restrained to <span class="math">\(3°\)</span> intervals in <span class="math">\([-30°, 30°]\)</span>, and translations were chosen as integers in <span class="math">\([-3, 3]\)</span>.</p>
+<p>The task to be learned was posed as classification over the set of possible rotations and translations, with the loss function being the sum of the losses for rotation, x-axis translation and y-axis translation. </p>
+<h2>The Network</h2>
+<p>Using the nomenclature BCNN (for Base Convolutional Neural Network) for the architecture of the Siamese networks and TCNN (for Top Convolutional Neural Network) for the network that takes input from the Siamese CNNs and outputs the final prediction, the architecture used was the following:</p>
+<ul>
+<li>
+<p>BCNN :</p>
+<ul>
+<li>A convolution layer, with 3x3 kernel and 96 filters, followed by ReLU nonlinearity;</li>
+<li>A 2x2 max-pooling layer;</li>
+<li>A convolution layer, with 3x3 kernel and 256 filters, followed by ReLU;</li>
+<li>A 2x2 max-pooling layer;</li>
+</ul>
+</li>
+<li>
+<p>TCNN :</p>
+<ul>
+<li>A fully-connected layer, with 500 filters, followed by ReLU nonlinearity;</li>
+<li>A dropout layer with 0.5 dropout;</li>
+<li>Three separate fully-connected layers, with 41, 13 and 13 outputs respectively (matching number of rotation, x translation and y translation classes);</li>
+<li>A softmax layer with logistic loss (with equal weights for each of the three predictions).</li>
+</ul>
+</li>
+</ul>
+<figure>
+    <img src="https://raw.githubusercontent.com/Joaoloula/siamese-tracking/master/docs/illustrations/bcnn-tcnn.jpg" alt='missing' align='middle' />
+    <figcaption> <sup>Scheme of a forward pass in the Siamese network: each image in the pair moves through the layers L1, ... Lk in one of the BCNNs, and their output is processed by the TCNN to make the prediction (source: [@@seebymoving]).</sup>
+</figure>
+
+<h1>Results</h1>
+<p>The network was trained using batches of 64 image pairs, with a base learning rate of <span class="math">\(10^{-7}\)</span> and inverse decay with <span class="math">\(\gamma = 0.1\)</span> and <span class="math">\(\text{power}=0.75\)</span>. The network seemed to converge after about 1000 iterations, to an accuracy of about <span class="math">\(3\%\)</span>for the rotation prediction and <span class="math">\(14\%\)</span> for the x and y translation predictions (about 1.25 times better than random guessing for the rotation and 2 times better for the translations). </p>
+<figure>
+    <img src="https://raw.githubusercontent.com/Joaoloula/siamese-tracking/master/docs/illustrations/mnist_training.png" alt='missing' align='middle' />
+    <figcaption> <sup>Value of the loss function throughout training iterations in the model.</sup>
+</figure>
+
+<h1>Coarse-Grain Parallelization</h1>
+<p>The simplest way to parallelize the program is to run multiple training batches on different nodes, as in the scheme below:</p>
+<figure>
+    <img src="https://raw.githubusercontent.com/Joaoloula/siamese-tracking/master/docs/illustrations/mpi_caffe_complete.png" alt='missing' align='middle' />
+    <figcaption> <sup>Example of a CNN architecture using fully parallelised using MPI-Caffe (source: [@@mpi-caffe])</sup>.
+</figure>
+
+<p>In this case, we're gaining a speedup in the <a href="https://en.wikipedia.org/wiki/Gustafson%27s_law">Gustafson sense</a>, that is, as we raise the number of processors, we also raise the size of the data we can compute in a given time. The speedup expression is then given by:</p>
+<div class="math">$$\text{speedup}_{\text{Gustafson}}(P) = \alpha_{seq} + P(1 - \alpha_{seq}) $$</div>
+<p>where P is the number of processors and <span class="math">\(\alpha_{seq}\)</span> is the proportion of the code that's not being parallelized. Seeing as in this scheme the whole network is being parallelized, we have:</p>
+<div class="math">$$\alpha_{seq} \approx 0 \Rightarrow \text{speedup}_{\text{Gustafson}}(P) \approx P $$</div>
+<p>Let's see how this fares in practice. In the figure below, we find a comparison of running times for the forward and backward passes in the network for one, two and four cores, the four core option using hyperthreading. What we find is that the two core case follows Gustafson's law closely, with a speedup coefficient of <span class="math">\(1.93\)</span>. In the four core case, however, performance is no better than with two cores, which probably means that hyperthreading is making no difference for this task.</p>
+<figure>
+    <img src="https://raw.githubusercontent.com/Joaoloula/siamese-tracking/master/docs/illustrations/cores_comparison.png" alt='missing' align='middle' />
+    <figcaption> <sup>Comparison between forward and backward pass times when running the network with 1, 2 or 4 cores with hyperthreading.</sup>
+</figure>
+
+<h1>Medium-Grain Parallelization</h1>
+<p>The interest of the Siamese CNNs architecture, however, is the possibility of parallelization on a lower level : we can distribute the two BCNN streams to two different nodes in the cluster, and then gather their results to perform the computations on the TCNN. Results are shown in the figure below: we can see that performance is almost as good as in the completely parallelized scheme, which confirms our knowledge that the convolutional layers are by far the most computationally-intensive ones, so that the BCNN accounts for most of the computations in the network. We can also see that the difference between these two parallelization schemes lies almost entirely in the backward pass: we can hypothesize that this is due to increased difficulty in computing the gradient through the gather and broadcast layers in the Medium-Grain scheme. </p>
+<figure>
+    <img src="https://raw.githubusercontent.com/Joaoloula/siamese-tracking/master/docs/illustrations/parallelizations_comparison.png" alt='missing' align='middle' />
+    <figcaption> <sup>Comparison between forward and backward pass times when running the network with no parallelization, with only the BCNN parallelized or with the whole code parallelized .</sup>
+</figure>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+            <a href="#" class="go-top">Go Top</a>
+    <div class="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = "mydisqus"; // required: replace example with your forum shortname
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+<footer class="footer">
+    <p>&copy; João Loula &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        try {
+            var pageTracker = _gat._getTracker("UA-00000000-0");
+            pageTracker._trackPageview();
+            } catch(err) {}
+    </script>
+
+</body>
+</html>

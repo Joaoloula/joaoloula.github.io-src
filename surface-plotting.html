@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="João Loula's Blog, Collected musings on neuroscience, machine learning and math.">
+
+
+        <title>Brain surface plotting with Nilearn // João Loula's Blog // Collected musings on neuroscience, machine learning and math.</title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://joaoloula.github.io/theme/css/pure.css">
+    <link rel="stylesheet" href="http://joaoloula.github.io/theme/css/pygments.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background-image: url('/images/cover_stone.jpg')">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <img class="avatar" src="/images/joao.jpg">
+                            <h1 class="brand-main"><a href="http://joaoloula.github.io">João Loula's Blog</a></h1>
+                            <p class="tagline">Collected musings on neuroscience, machine learning and math.</p>
+                                <p class="social">
+                                    <a href="https://github.com/joaoloula">
+                                        <i class="fa fa-github-square fa-3x"></i>
+                                    </a>
+                                    <a href="https://fr.linkedin.com/in/joão-loula-2836b9107">
+                                        <i class="fa fa-linkedin-square fa-3x"></i>
+                                    </a>
+                                    <a href="mailto:joao.campos-loula@polytechnique.edu">
+                                        <i class="fa fa-envelope-square fa-3x"></i>
+                                    </a>
+                                    <a href="https://twitter.com/JoaoLoula">
+                                        <i class="fa fa-twitter-square fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Brain surface plotting with Nilearn</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="http://joaoloula.github.io/tag/surface-plot.html">surface plot</a>
+                                <a class="post-category" href="http://joaoloula.github.io/tag/atlas.html">atlas</a>
+                                <a class="post-category" href="http://joaoloula.github.io/tag/statistical-map.html">statistical map</a>
+                        </p>
+                </header>
+            </section>
+            <p>In this post we'll explore Nilearn's future surface plotting capabilities through an example using seed-based resting state connectivity analysis. This is based on work done by Julia Huntenburg (you can take a look at the PR's progress <a href="https://github.com/nilearn/nilearn/pull/1016">here</a>) with whom I had the pleasure of collaborating on the 2016 Paris Brainhack.</p>
+<h2>Setting things up</h2>
+<p>We start by importing the libraries we're gonna need:</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">nilearn</span> <span class="kn">import</span> <span class="n">plotting</span>
+<span class="kn">from</span> <span class="nn">nilearn</span> <span class="kn">import</span> <span class="n">datasets</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">import</span> <span class="nn">nibabel</span> <span class="kn">as</span> <span class="nn">nb</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+</pre></div>
+
+
+<p>In this example we'll use the Rockland NKI enhanced resting state dataset <a href='#nki' id='ref-nki-1'>(Nooner et al., 2012)</a>, a dataset containing 100 subjects with ages ranging from 6 to 85 years that aims at characterizing brain development, maturation and aging.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Retrieve the data</span>
+<span class="n">nki_dataset</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">fetch_surf_nki_enhanced</span><span class="p">(</span><span class="n">n_subjects</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># NKI resting state data set of one subject left hemisphere in fsaverage5 space</span>
+<span class="n">resting_state</span> <span class="o">=</span> <span class="n">nki_dataset</span><span class="p">[</span><span class="s1">&#39;func_left&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+
+<p>We'll want to define regions of interest for our analysis: for this, we'll need a brain parcellation. For this purpose, we'll use the sulcal-depth based Destrieux cortical atlas <a href='#destrieux' id='ref-destrieux-1'>(Destrieux et al., 2009)</a>: </p>
+<div class="highlight"><pre><span></span><span class="c1"># Destrieux parcellation left hemisphere in fsaverage5 space</span>
+<span class="n">destrieux_atlas</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">fetch_atlas_surf_destrieux</span><span class="p">()</span>
+<span class="n">parcellation</span> <span class="o">=</span> <span class="n">nb</span><span class="o">.</span><span class="n">freesurfer</span><span class="o">.</span><span class="n">read_annot</span><span class="p">(</span><span class="n">destrieux_atlas</span><span class="p">[</span><span class="s1">&#39;annot_left&#39;</span><span class="p">])</span>
+</pre></div>
+
+
+<p>The Destrieux parcellation is based on the Fsaverage5 <a href='#fsaverage5' id='ref-fsaverage5-1'>(Fischl et al., 2004)</a> surface data, so we'll go ahead and fetch that as well so as to be able to plot our atlas.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Retrieve fsaverage data</span>
+<span class="n">fsaverage</span> <span class="o">=</span> <span class="n">datasets</span><span class="o">.</span><span class="n">fetch_surf_fsaverage5</span><span class="p">()</span>
+
+<span class="c1"># Fsaverage5 left hemisphere surface mesh files</span>
+<span class="n">fsaverage5_pial</span> <span class="o">=</span> <span class="n">fsaverage</span><span class="p">[</span><span class="s1">&#39;pial_left&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">fsaverage5_inflated</span> <span class="o">=</span> <span class="n">fsaverage</span><span class="p">[</span><span class="s1">&#39;infl_left&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">sulcal_depth_map</span> <span class="o">=</span> <span class="n">fsaverage</span><span class="p">[</span><span class="s1">&#39;sulc_left&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+
+
+<p>Last steps needed for our analysis: we'll pick a region as seed (we'll choose the dorsal posterior cingulate gyrus) and extract the time-series correspondent to it. Next, we want to calculate statistical correlation between the seed time-series and time-series of other cortical regions. For our measure of correlation, we'll use the Pearson product-moment correlation coefficient, given by <span class="math">\( \rho_{X, Y} \frac{\text{cov}\left( X, Y \right)}{ \sigma_X \sigma_Y }\)</span>.</p>
+<div class="highlight"><pre><span></span><span class="c1"># Load resting state time series and parcellation</span>
+<span class="n">timeseries</span> <span class="o">=</span> <span class="n">plotting</span><span class="o">.</span><span class="n">surf_plotting</span><span class="o">.</span><span class="n">check_surf_data</span><span class="p">(</span><span class="n">resting_state</span><span class="p">)</span>
+
+<span class="c1"># Extract seed region: dorsal posterior cingulate gyrus</span>
+<span class="n">region</span> <span class="o">=</span> <span class="s1">&#39;G_cingul-Post-dorsal&#39;</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">parcellation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">parcellation</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">region</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Extract time series from seed region</span>
+<span class="n">seed_timeseries</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">timeseries</span><span class="p">[</span><span class="n">labels</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Calculate Pearson product-moment correlation coefficient between seed</span>
+<span class="c1"># time series and timeseries of all cortical nodes of the hemisphere</span>
+<span class="n">stat_map</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">timeseries</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">timeseries</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="n">stat_map</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span><span class="n">seed_timeseries</span><span class="p">,</span> <span class="n">timeseries</span><span class="p">[</span><span class="n">i</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Re-mask previously masked nodes (medial wall)</span>
+<span class="n">stat_map</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">timeseries</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+
+
+<h2>Plotting</h2>
+<p>Now for the actual plotting: we start by plotting the seed:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Display ROI on surface</span>
+<span class="n">plotting</span><span class="o">.</span><span class="n">plot_surf_roi</span><span class="p">(</span><span class="n">fsaverage5_pial</span><span class="p">,</span> <span class="n">roi_map</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">hemi</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                       <span class="n">view</span><span class="o">=</span><span class="s1">&#39;medial&#39;</span><span class="p">,</span> <span class="n">bg_map</span><span class="o">=</span><span class="n">sulcal_depth_map</span><span class="p">,</span> <span class="n">bg_on_data</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plotting</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/surf-plotting/roi.png"/>
+</p>
+
+<p>Next, we'll plot the correlation statistical map in both the lateral and medial views:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Display unthresholded stat map in lateral and medial view</span>
+<span class="c1"># dimmed background</span>
+<span class="n">plotting</span><span class="o">.</span><span class="n">plot_surf_stat_map</span><span class="p">(</span><span class="n">fsaverage5_pial</span><span class="p">,</span> <span class="n">stat_map</span><span class="o">=</span><span class="n">stat_map</span><span class="p">,</span> <span class="n">hemi</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                            <span class="n">bg_map</span><span class="o">=</span><span class="n">sulcal_depth_map</span><span class="p">,</span> <span class="n">bg_on_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                            <span class="n">darkness</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plotting</span><span class="o">.</span><span class="n">plot_surf_stat_map</span><span class="p">(</span><span class="n">fsaverage5_pial</span><span class="p">,</span> <span class="n">stat_map</span><span class="o">=</span><span class="n">stat_map</span><span class="p">,</span> <span class="n">hemi</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                            <span class="n">view</span><span class="o">=</span><span class="s1">&#39;medial&#39;</span><span class="p">,</span> <span class="n">bg_map</span><span class="o">=</span><span class="n">sulcal_depth_map</span><span class="p">,</span>
+                            <span class="n">bg_on_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">darkness</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plotting</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/surf-plotting/lateral.png"/>
+</p>
+
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/surf-plotting/medial.png"/>
+</p>
+
+<p>Finally, to show off Nilearn's plotting capabilities, we'll play a little with colormaps and transparency:</p>
+<div class="highlight"><pre><span></span><span class="c1"># Displaying a thresholded stat map with a different colormap and transparency</span>
+<span class="n">plotting</span><span class="o">.</span><span class="n">plot_surf_stat_map</span><span class="p">(</span><span class="n">fsaverage5_pial</span><span class="p">,</span> <span class="n">stat_map</span><span class="o">=</span><span class="n">stat_map</span><span class="p">,</span> <span class="n">hemi</span><span class="o">=</span><span class="s1">&#39;left&#39;</span><span class="p">,</span>
+                            <span class="n">bg_map</span><span class="o">=</span><span class="n">sulcal_depth_map</span><span class="p">,</span> <span class="n">bg_on_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                            <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;Spectral&#39;</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=.</span><span class="mi">6</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">plotting</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/surf-plotting/alpha.png"/>
+</p>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%&#64;#$&#64;#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%&#64;#$&#64;#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script><hr>
+<h2>Bibliography</h2>
+<p id='destrieux'>C.&nbsp;Destrieux, Fischl B., Dale&nbsp;A. M., and Halgren A.
+A sulcal depth-based anatomical parcellation of the cerebral cortex.
+<em>Neuroimage</em>, 2009. <a class="cite-backref" href="#ref-destrieux-1" title="Jump back to reference 1">↩</a></p>
+<p id='fsaverage5'>B.&nbsp;Fischl, A.&nbsp;van&nbsp;der Kouwe, C.&nbsp;Destrieux, E.&nbsp;Halgren, F.&nbsp;Ségonne, D.&nbsp;H. Salat, E.&nbsp;Busa, L.&nbsp;J. Seidman, J.&nbsp;Goldstein, D.&nbsp;Kennedy, V.&nbsp;Caviness, N.&nbsp;Makris, B.&nbsp;Rosen, and A.&nbsp;M. Dale.
+Automatically parcellating the human cerebral cortex.
+<em>Cerebral Cortex</em>, 2004. <a class="cite-backref" href="#ref-fsaverage5-1" title="Jump back to reference 1">↩</a></p>
+<p id='nki'>K.&nbsp;B. Nooner, S.&nbsp;J. Colcombe, R.&nbsp;H. Tobe, M.&nbsp;Mennes, M.&nbsp;M. Benedict, A.&nbsp;L. Moreno, S.&nbsp;Panek, L.&nbsp;J.&nbsp;Brown, S.&nbsp;T. Zavitz, Q.&nbsp;Li, S.&nbsp;Sikka, D.&nbsp;Gutman, S.&nbsp;Bangaru, R.&nbsp;T. Schlachter, S.&nbsp;M. Kamiel, A.&nbsp;R Anwar, C.&nbsp;M. Hinz, M.&nbsp;S. Kaplan, A.&nbsp;B. Rachlin, S.&nbsp;Adelsberg, B.&nbsp;Cheung, R.&nbsp;Khanuja, C.&nbsp;Yan, C.&nbsp;C. Craddock, V.&nbsp;Calhoun, W.&nbsp;Courtney, M.&nbsp;King, D.&nbsp;Wood, C.&nbsp;L. Cox, A.&nbsp;M. Kelly, A.&nbsp;Di&nbsp;Martino, E.&nbsp;Petkova, P.&nbsp;T. Reiss, N.&nbsp;Duan, D.&nbsp;Thomsen, B.&nbsp;Biswal, B.&nbsp;Coffey, M.&nbsp;J. Hoptman, D.&nbsp;C. Javitt, N.&nbsp;Pomara, J.&nbsp;J. Sidtis, H.&nbsp;S. Koplewicz, F.&nbsp;X. Castellanos, B.&nbsp;L. Leventhal, and M.&nbsp;P. Milham.
+The nki-rockland sample: a model for accelerating the pace of discovery science in psychiatry.
+<em>Frontiers in Neuroscience</em>, 2012. <a class="cite-backref" href="#ref-nki-1" title="Jump back to reference 1">↩</a></p>
+
+            <a href="#" class="go-top">Go Top</a>
+    <div class="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = "mydisqus"; // required: replace example with your forum shortname
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+<footer class="footer">
+    <p>&copy; João Loula &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        try {
+            var pageTracker = _gat._getTracker("UA-00000000-0");
+            pageTracker._trackPageview();
+            } catch(err) {}
+    </script>
+
+</body>
+</html>

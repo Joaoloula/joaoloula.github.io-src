@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="João Loula's Blog, Collected musings on neuroscience, machine learning and math.">
+
+
+        <title>Brownian Motion // João Loula's Blog // Collected musings on neuroscience, machine learning and math.</title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="http://joaoloula.github.io/theme/css/pure.css">
+    <link rel="stylesheet" href="http://joaoloula.github.io/theme/css/pygments.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+    <div class="pure-g-r" id="layout">
+        <div class="sidebar pure-u">
+            <div class="cover-img" style="background-image: url('/images/cover_stone.jpg')">
+                <div class="cover-body">
+                    <header class="header">
+                        <hgroup>
+                            <img class="avatar" src="/images/joao.jpg">
+                            <h1 class="brand-main"><a href="http://joaoloula.github.io">João Loula's Blog</a></h1>
+                            <p class="tagline">Collected musings on neuroscience, machine learning and math.</p>
+                                <p class="social">
+                                    <a href="https://github.com/joaoloula">
+                                        <i class="fa fa-github-square fa-3x"></i>
+                                    </a>
+                                    <a href="https://fr.linkedin.com/in/joão-loula-2836b9107">
+                                        <i class="fa fa-linkedin-square fa-3x"></i>
+                                    </a>
+                                    <a href="mailto:joao.campos-loula@polytechnique.edu">
+                                        <i class="fa fa-envelope-square fa-3x"></i>
+                                    </a>
+                                    <a href="https://twitter.com/JoaoLoula">
+                                        <i class="fa fa-twitter-square fa-3x"></i>
+                                    </a>
+                                </p>
+                        </hgroup>
+                    </header>
+                </div>
+            </div>
+        </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Brownian Motion</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="http://joaoloula.github.io/tag/brownian-motion.html">brownian motion</a>
+                                <a class="post-category" href="http://joaoloula.github.io/tag/stochastic-process.html">stochastic process</a>
+                                <a class="post-category" href="http://joaoloula.github.io/tag/physics.html">physics</a>
+                        </p>
+                </header>
+            </section>
+            <p>In this post, we'll explore different characteristics of the Brownian motion, going from the discrete to the continuous case, and finally expressing the particle's behavior in large times. This model has been the subject of various applications in different areas, like biochemistry, medical imaging and financial markets, and the domain has shown itself to be a fertile subject in mathematics, with important contributions from the likes of Paul Levy, Norbert Wiener and Albert Einstein.</p>
+<p>Code for this post can be found <a href="https://github.com/Joaoloula/joaoloula.github.io-src/tree/master/content/posts/brownian-motion/code">here</a></p>
+<h2>Discovering the Brownian movement</h2>
+<p>Let <span class="math">\(X_i\)</span> be a sequence of Bernoulli random variables that take the values <span class="math">\(-1\)</span> and <span class="math">\(1\)</span> with equal probability. We can then define the random variable <span class="math">\(B_n\)</span> as: </p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/equations/brown_definition.jpg"/>
+</p>
+
+<p>We can show, using the central limit theorem, that <span class="math">\(B_n\)</span> converges in law to a centered normal distribution of variance <span class="math">\(t\)</span> when <span class="math">\(n\)</span> goes to infinity. Taking this limit in a vector <span class="math">\((B_n(t))\)</span> whose entries are <span class="math">\(B_n\)</span> calculated at increasing times, we obtain the stochastic process <span class="math">\((B(t))\)</span>, that we call the Brownian movement. Its first remarkable property is that, by construction, given <span class="math">\(t\)</span> bigger than <span class="math">\(s\)</span>:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/equations/brown_property.jpg"/>
+</p>
+
+<p>It can also be proved that it is continuous but nowhere differentiable. Let's get an idea for what it looks like. In one dimension, for <span class="math">\(n=100\)</span> and <span class="math">\(t=100\)</span>:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S4-(n=100, t=100).png"/>
+</p>
+
+<p>In two and three dimensions, for <span class="math">\(n=100\)</span> and <span class="math">\(t=1000\)</span> (the time axis is now ommited):</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S5-2d-(n=100, t=1000).png"/>
+</p>
+
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/cover.png"/>
+</p>
+
+<p>Quite the looker, isn't it? We'll now try a more quantitative analysis to get a feel for what's going on.</p>
+<h2>Position and speed distribution in discrete time</h2>
+<p>Robert Brown, the botanist after whom the process is named, first discovered it when observing the movement of pollen particules suspended in water: the random collisions of water mollecules with the particules created a very irregular movement that he was incapable of explaining. The phenomenon was later explained in detail by Einstein in a 1905 paper [1]. The model can be explained as follows: the acceleration of the particule is proportional to the force exercised by the random collisions; there's also a friction force proportional to the particle's speed (we'll call this proportionnality factor lambda). We'll ignore weight as well as buoyancy: we can get away with this because the pollen particle is really small.</p>
+<p>We'll introduce a time interval <span class="math">\(\alpha\)</span>, during which the particle suffers <span class="math">\(N \alpha\)</span> collisions (which we suppose to be a very large number). The collisions (which we'll identify by <span class="math">\(\epsilon_i\)</span>) are supposed to be independent and identically distributed of random intensity centered at <span class="math">\(0\)</span> and square integrable (of variance <span class="math">\(\sigma\)</span>). We obtain the following expression then for the evolution of the particle's velocity:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/equations/pollen_model.jpg"/>
+</p>
+
+<p>Where <span class="math">\(Y\)</span> is a random variable of centered gaussian distribution with variance one (which we can infer from applying the central limit theorem to the first expression). To make the notation less cluttered, we'll set <span class="math">\(a = -\lambda\alpha\)</span> and <span class="math">\(b = \sqrt{N\sigma^2\alpha}\)</span>.</p>
+<p>The interest of this formulation is that we can now proceed to quantitaive analysis of the position <span class="math">\(X_n\)</span> and velocity <span class="math">\(V_n\)</span> of a particle subject to brownian movement (<span class="math">\(X_n\)</span> is just a "discrete integration" of the velocity, that is, a <span class="math">\(\sum\limits_{i} V_i\alpha\)</span>). </p>
+<p>We can now show that <span class="math">\(X_n\)</span> and <span class="math">\(V_n\)</span> follow gaussian distributions: even better, by exploiting the independence of  <span class="math">\((Y_i)\)</span>, we can prove that any linear combination of <span class="math">\(X_n\)</span> and <span class="math">\(V_n\)</span> also follows a gaussian distribution, which allows us to conclude that <span class="math">\((X_n, Y_n)\)</span> is a gaussian vector. If we note the initial position and velocity by <span class="math">\(x\)</span> and <span class="math">\(v\)</span> respectively, its mean is given by:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/equations/xn_vn_mean.jpg"/>
+</p>
+
+<p>Now that we're all set up, let's see what happens when we play around with the parameters. This is a simulation for <span class="math">\(a = 0.5\)</span> and <span class="math">\(b = 1\)</span>:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S8-(a=0.5, b=1).png"/>
+</p>
+
+<p>This one, for <span class="math">\(a = 1\)</span> and <span class="math">\(b = 0.1\)</span>:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S8-(a=1, b=0.1).png"/>
+</p>
+
+<p>And finally, for <span class="math">\(a = 0.1\)</span> and <span class="math">\(b = 10\)</span>:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S8-(a=0.1, b=10).png"/>
+</p>
+
+<p>What we see is that the term <span class="math">\(a\)</span> controls the influence of the previous velocity over the next one (the "memory" of the process) and <span class="math">\(b\)</span>, it's degree of randomness, which goes well with our characterization of these parameters earlier (multiplying previous velocity and a random gaussian variable in the update rule, respectively). We see, in the first simulation, a random process with an upwards drift, explained by the memory of the initial velocity. In the second one, we have an almost perfect exponential, since the random character of the curve is almost suppressed by the small <span class="math">\(b\)</span> value. In the final simulation, however, we have almost no memory and the process is mostly chaotic. This last one is then more likely the one that resembles the most the results that Brown found, and we can use the discrete integration process described earlier to simulate the movement of a pollen particule in the surface of a water tank based on these parameters:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S8-3-pollen2d.png"/>
+</p>
+
+<h2>Continuous time</h2>
+<p>So we've gotten some pretty interesting results so far for our model of Brownian movement, but you might be thinking our formulation is not yet satisfactory for a large range of problems: most systems do not behave in an organized discrete manner, weighing inputs like they were votes and then deciding which action to take at each discrete time step, but are rather complicated phenomena that are at all times being influenced by different factors in a <em>continuous</em> way -- or at least, like stock markets, chains of events that happen so quickly with respect to our measuring instruments and reaction times that they might as well be continuous. We can then ask ourselves if there's a rigorous mathematical way in which we can expand Brownian motion to continuous time. That's the problem we'll address in this section.</p>
+<p>We'll take <span class="math">\(K\)</span> to be the inverse of the timestep <span class="math">\(\alpha\)</span>. We know then, by the previous section's results, that for a fixed <span class="math">\(K\)</span>, <span class="math">\((X_t^K, Y_t^K)\)</span> a gaussian vector. Their characteristic function <span class="math">\(\phi_{X_t^K, Y_t^K}\)</span> is given by:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/equations/phi.jpg"/>
+</p>
+
+<p>Where <span class="math">\(C\)</span> is the covariance matrix of the position and velocity random variables. We can calculate the limits when <span class="math">\(K\)</span> goes to infinity of the two expected values from the formulas we found for the expected values in the previous section:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/equations/vn_limit.jpg"/>
+</p>
+
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/equations/xn_limit.jpg"/>
+</p>
+
+<p>The limit of the covariance matrix is a little bit more complicated, and so we'll omit it here: it suffices to know that it converges. We then have convergence of the characteristic function to another function <span class="math">\(\phi\)</span> that's also the characteristic function of a gaussian. By Lebesgue's dominated convergence theorem, we know that <span class="math">\(\phi\)</span> is continuous at zero, and so we can conclude by Levy's theorem that <span class="math">\((X_t^K, Y_t^K)\)</span> converges in distribution to a gaussian vector.</p>
+<p>In the continuous limit, velocity variance is well-behaved with respect to time, the variance of the position random variable, however, diverges. To verify this point, we'll plot histograms of <span class="math">\(X\)</span> values in the continuous approximation for the times 100, 1000 and 10000, while paying attention to the axes:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S10-1-(t=100).png"/>
+</p>
+
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S10-(t=1000).png"/>
+</p>
+
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S10-2-(t=10000).png"/>
+</p>
+
+<p>We can se that the positions spread wider and wider as we increase the timescale. </p>
+<h2>A kinetic model</h2>
+<p>This sort of behavior for the position variable, while corresponding to the idea of a free evolution of the particle, is not always desirable. More precisely, in many physical systems, the particle's a priori unbounded movement is counteracted by a force that attracts it to a center (a charged particle, a massive body). This is the sort of model we'll investigate in this section. With this goal in mind, we introduce new velocity and position random variables defined by:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/equations/vn_final.jpg"/>
+</p>
+
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/equations/xn_final.jpg"/>
+</p>
+
+<p>Where <span class="math">\(D\)</span> is called the diffusion coefficient and <span class="math">\(\beta\)</span> is a strictly positive value.</p>
+<p>The problem with this formulation is that now that the variables are coupled it is quite tricky to solve the system. A more interesting approach would be to do a spectral analysis of the recurrence matrix: for large values of <span class="math">\(K\)</span>, the anti-diagonal is dominated by the term <span class="math">\(-\beta\)</span>, that plays a regulatory role in the system, and we expect to see imaginary eigenvalues that will define an envelope curve as well as a strong oscillatory behavior. We can run a simulation of the system with large initial conditions in <span class="math">\(X\)</span> and <span class="math">\(V\)</span> to verify its behavior:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S13 - (position estabilize jolie).png"/>
+</p>
+
+<p>Besides confirming our hypothesis as we can see from the exponential envelope and sinusoidal oscillations, it is worth noting that the initial conditions become meaningless over time: the system is always brought close to the center of oscillation. What is perhaps most interesting, though, is that the system does not get arbitrarily close to the center, that is, the motion does not converge, as we can see in this simulation with zero initial condition:</p>
+<p align="center">
+  <img src = "https://raw.githubusercontent.com/Joaoloula/joaoloula.github.io-src/master/content/posts/brownian-motion/simulations/S13-(position t=100, K=25).png"/>
+</p>
+
+<h2>References</h2>
+<p>[1] http://users.physik.fu-berlin.de/~kleinert/files/eins_brownian.pdf</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    var location_protocol = (false) ? 'https' : document.location.protocol;
+    if (location_protocol !== 'http' && location_protocol !== 'https') location_protocol = 'https:';
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = location_protocol + '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+            <a href="#" class="go-top">Go Top</a>
+    <div class="comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = "mydisqus"; // required: replace example with your forum shortname
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function() {
+                var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+    </div>
+<footer class="footer">
+    <p>&copy; João Loula &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure-single">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+    </div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+    <script type="text/javascript">
+        var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+        document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+    </script>
+    <script type="text/javascript">
+        try {
+            var pageTracker = _gat._getTracker("UA-00000000-0");
+            pageTracker._trackPageview();
+            } catch(err) {}
+    </script>
+
+</body>
+</html>

@@ -6,7 +6,7 @@ AUTHOR = 'João Loula'
 SITENAME = 'João Loula\'s Blog'
 TAGLINE = 'Collected musings on neuroscience, machine learning and math.'
 SITEURL = 'http://joaoloula.github.io'
-THEME = 'pure-single-master'
+THEME = 'pure-single'
 PATH = 'content'
 STATIC_PATHS = ['images', 'pages', 'pdfs']
 TIMEZONE = 'Europe/Paris'
@@ -35,8 +35,8 @@ PROFILE_IMG_URL = '/images/joao.jpg'
 DEFAULT_PAGINATION = 10
 
 # Plugins
-PLUGIN_PATHS = ["plugins"]
-PLUGINS = ['render-math', 'pelican-cite']
+PLUGIN_PATHS = ["/home/loula/Programming/pelican_stuff/pelican-plugins/"]
+PLUGINS = ['render_math', 'pelican-cite']
 
 # Uncomment following line if you want document-relative URLs when developing
 # RELATIVE_URLS = True

@@ -5,11 +5,11 @@ Tags: reinforcement learning, model arbitration, episodic memory
 Slug: reinforcement-learning
 Author: João Loula
 publications_src: content/posts/reinforcement-learning/references.bib
-Summary: In this post we'll take a look at reinforcement learning, one of the most successful frameworks lately both for enabling AI to perform human-like tasks and for understanding how humans themselves learn these behaviors. 
+Summary: In this post we'll take a look at reinforcement learning, one of the most successful frameworks lately both for enabling AI to perform human-like tasks and for understanding how humans themselves learn these behaviors.
 
 ##Introduction
 
-In this post we'll take a look at reinforcement learning, one of the most successful frameworks lately both for enabling AI to perform human-like tasks and for understanding how humans themselves learn these behaviors. 
+In this post we'll take a look at reinforcement learning, one of the most successful frameworks lately both for enabling AI to perform human-like tasks and for understanding how humans themselves learn these behaviors.
 
 The premise is that of an agent in an environment in which it is trying to achieve a certain goal. The agent interacts with the environment in two ways that form a feedback loop:
 
@@ -85,7 +85,7 @@ Model-based learning pros and cons are:
 
 - Computationally expensive, since running estimates of all parameters for an internal model of the MDP must be kept, and used for decision-making computations.
 
-\section*{When to use each learning algorithm class?}
+##When to use each learning algorithm class?
 
 While from the pros and cons listed we could imagine having a grasp on which learning tasks benefit one class of algorithms over the other, a recent study [@@kool] argues that the classically used Daw 2-step task [@@daw] and its variations do not offer a model-free vs. model-based trade-off. It is argued that this is a cause of the following characteristics:
 
@@ -110,23 +110,23 @@ Many problems arise when trying to apply the view of reinforcement learning we p
 
 How then is the brain able to learn whilst generalizing such complex structure from such limited data? A recent paper [@@episodic-learning] argues that episodic memory could help address these concerns.
 
-Episodic memory refers to detailed autobiographical memories, things like memories of your wedding ceremony or of what you had for breakfast this morning. These instances are called *episodes*. 
+Episodic memory refers to detailed autobiographical memories, things like memories of your wedding ceremony or of what you had for breakfast this morning. These instances are called *episodes*.
 
 The idea of the RL model is the following: the value of a state can be approximated by the interpolation of different episodes using a kernel function $K$. For example, supposing all episodes to have a fixed length $t$, if we denote by $ s_{t}^{m}$ the state at time $t$ under the episode $m$, we have:
 
 $$ Q_\pi(s_0, a) = \frac{\sum_{m} R_mK(s_0, s_{t}^{m})}{N}$$
 
-where $R_m$ is the reward for episode $m$, and $N$ is a normalization factor, equal to $\sum_m K(s_0, s_{t}^{m})$. 
+where $R_m$ is the reward for episode $m$, and $N$ is a normalization factor, equal to $\sum_m K(s_0, s_{t}^{m})$.
 
 The Kernel is at the heart of the model's generalization power: it can be, for example, a gaussian allowing for smoothly combining episodes, or a step function that only averages episodes whose final states are close enough to $s_0$ by some distance metric. This flexibility can capture the structure of different kinds of state spaces.
 
 The temporal dependency problem remains: in order to address it, we must first note that the breaking of the Markov property *inside* an episode poses no problem for the model. We can therefore chunk temporal dependencies inside episodes, using the Markov property only to stitch them together through the Bellman equation.
 
-This might look something like this, by allowing episodes of various lengths $t_m$ and letting the Kernel take those lengths into account: 
+This might look something like this, by allowing episodes of various lengths $t_m$ and letting the Kernel take those lengths into account:
 
 $$ Q_\pi(s_0, a) = \frac{1}{N} \sum_{m} K(s_1, s_{t_m}^{m}, t_m) \left[R_m +\gamma^{t_m}\sum_{s}P(s_{t_m+1}^{m}=s| s_{t_m}^{m}, \pi(s_{t_m}^{m}))Q_\pi(s, \pi(s))\right]$$
 
-where $N$ is still a normalization parameter. 
+where $N$ is still a normalization parameter.
 
 ##A link between episodes and MF/MB algorithms?
 
